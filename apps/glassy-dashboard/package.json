@@ -44,7 +44,7 @@
     "artifactName": "Glassy-Dashboard-${version}-${os}-${arch}.${ext}",
     "directories": {
       "output": "release",
-      "buildResources": "build"
+      "buildResources": "resources"
     },
     "files": [
       "dist/**",
@@ -54,7 +54,7 @@
     "publish": null,
     "mac": {
       "category": "public.app-category.business",
-      "icon": "build/icon.png",
+      "icon": "resources/icon.png",
       "target": [
         {
           "target": "dmg",
@@ -100,7 +100,7 @@
       ]
     },
     "win": {
-      "icon": "build/icon.png",
+      "icon": "resources/icon.png",
       "target": [
         {
           "target": "nsis",
@@ -133,7 +133,7 @@
         "AppImage"
       ],
       "category": "Office",
-      "icon": "build/icon.png"
+      "icon": "resources/icon.png"
     }
   },
   "repository": {
