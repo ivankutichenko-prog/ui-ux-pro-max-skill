@@ -1,0 +1,88 @@
+name: Glassy Dashboard — desktop builds
+
+# Builds the Windows (.exe) and macOS (.dmg) installers of apps/glassy-dashboard.
+# - every push that touches the app: installers are attached to the run as artifacts
+# - a tag like `dashboard-v1.0.0`: installers are also published as a GitHub Release
+on:
+  push:
+    paths:
+      - 'apps/glassy-dashboard/**'
+      - '.github/workflows/glassy-dashboard.yml'
+    tags:
+      - 'dashboard-v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: glassy-dashboard-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build (${{ matrix.name }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macOS
+            os: macos-latest
+            script: dist:mac
+            files: |
+              apps/glassy-dashboard/release/*.dmg
+              apps/glassy-dashboard/release/*.zip
+          - name: Windows
+            os: windows-latest
+            script: dist:win
+            files: |
+              apps/glassy-dashboard/release/*.exe
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: apps/glassy-dashboard
+    env:
+      # Unsigned build: no Apple / Windows code-signing certificates are configured.
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/glassy-dashboard/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build installers
+        run: npm run ${{ matrix.script }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Glassy-Dashboard-${{ matrix.name }}
+          path: ${{ matrix.files }}
+          if-no-files-found: error
+          retention-days: 30
+
+  release:
+    name: Publish release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/dashboard-v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          name: Glassy Dashboard ${{ github.ref_name }}
+          files: dist/*
+          body: |
+            **Windows:** скачайте `Glassy-Dashboard-…-win-x64.exe` (установщик) или `…-portable.exe` (без установки).
+            **macOS:** `…-mac-arm64.dmg` для Apple Silicon (M1–M4), `…-mac-x64.dmg` для Intel.
+            Сборка без подписи разработчика — при первом запуске macOS: правый клик по приложению → «Открыть».
