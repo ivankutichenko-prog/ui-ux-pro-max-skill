@@ -66,6 +66,13 @@ jobs:
           if-no-files-found: error
           retention-days: 30
 
+      - name: Download hint
+        shell: bash
+        run: |
+          echo "### Glassy Dashboard — ${{ matrix.name }} ✅" >> "$GITHUB_STEP_SUMMARY"
+          echo "Скачайте архив **Glassy-Dashboard-${{ matrix.name }}** в блоке *Artifacts* внизу этой страницы." >> "$GITHUB_STEP_SUMMARY"
+          ls release >> "$GITHUB_STEP_SUMMARY"
+
   release:
     name: Publish release
     needs: build
