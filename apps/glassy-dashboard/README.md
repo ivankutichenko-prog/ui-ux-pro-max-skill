@@ -39,6 +39,7 @@
 
 Сборка для Windows и macOS делается автоматически в GitHub Actions (`.github/workflows/glassy-dashboard.yml`):
 
+0. Один раз включите Actions в репозитории: *Settings → Actions → General → «Allow all actions and reusable workflows» → Save*.
 1. Откройте вкладку **Actions → «Glassy Dashboard — desktop builds»** и выберите последний успешный запуск.
 2. Внизу, в блоке **Artifacts**, скачайте:
    - `Glassy-Dashboard-Windows` → `Glassy-Dashboard-1.0.0-win-x64.exe` (установщик) или `…-portable.exe` (без установки);
